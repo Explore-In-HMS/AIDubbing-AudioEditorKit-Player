@@ -47,4 +47,7 @@ dependencies {
     implementation 'com.huawei.hms:audio-editor-sdk:1.4.0.301'
     implementation 'com.huawei.agconnect:agconnect-core:1.6.0.300'
 
+
+    implementation 'com.huawei.hms:ml-computer-voice-aft:3.4.0.301'
+    implementation 'com.huawei.hms:ml-computer-voice-realtimetranscription:3.4.0.302'
 }

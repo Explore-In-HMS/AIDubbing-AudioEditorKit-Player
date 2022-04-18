@@ -16,12 +16,11 @@
 package com.huawei.audioeditorkitcustomdemo
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.huawei.audioeditorkitcustomdemo.ui.DubbingFragment
 import com.huawei.audioeditorkitcustomdemo.utils.ManagePermissions
-import com.huawei.hms.audioeditor.common.agc.HAEApplication
 
 class MainActivity : AppCompatActivity() {
     private val dubbingFragment: Fragment = DubbingFragment()
@@ -31,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setFragment(dubbingFragment)
 
-        HAEApplication.getInstance().apiKey ="Enter api key here..."
         val list = listOf<String>(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE

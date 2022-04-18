@@ -11,19 +11,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:layout_marginTop="120dp"
-            android:src="@drawable/audio_file"
-            android:layout_gravity="center" />
         <TextView
-            android:id="@+id/txt_filename"
+            android:id="@+id/txt_input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="30dp"
+            android:layout_margin="30dp"
             android:layout_gravity="center"
             android:text="placeholder.wav"/>
         <LinearLayout
