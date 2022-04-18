@@ -16,19 +16,26 @@
 package com.huawei.audioeditorkitcustomdemo.ui
 
 import android.media.AudioFormat
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
 import android.util.Pair
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
+import com.huawei.audioeditorkitcustomdemo.App
 import com.huawei.audioeditorkitcustomdemo.R
+import com.huawei.audioeditorkitcustomdemo.model.TranscriptedWord
 import com.huawei.audioeditorkitcustomdemo.utils.FileUtils
 import com.huawei.audioeditorkitcustomdemo.utils.PCMToWav
 import com.huawei.hms.audioeditor.sdk.engine.dubbing.*
+import com.huawei.hms.mlsdk.aft.cloud.MLRemoteAftEngine
+import com.huawei.hms.mlsdk.aft.cloud.MLRemoteAftListener
+import com.huawei.hms.mlsdk.aft.cloud.MLRemoteAftResult
+import com.huawei.hms.mlsdk.aft.cloud.MLRemoteAftSetting
 import java.io.File
 
 
@@ -113,6 +120,68 @@ class DubbingFragment : Fragment() {
         }
     }
 
+    private fun initTranscription() {
+        val setting = MLRemoteAftSetting.Factory()
+            .setLanguageCode("en-US")
+            .enableWordTimeOffset(true)
+            .create()
+
+        val engine = MLRemoteAftEngine.getInstance()
+        engine.init(requireContext())
+
+        engine.setAftListener(getAftListener())
+        engine.shortRecognize(Uri.fromFile(File(audioPath)), setting)
+    }
+
+    private fun getAftListener(): MLRemoteAftListener? {
+        val aftListener: MLRemoteAftListener = object : MLRemoteAftListener {
+            override fun onResult(taskId: String?, result: MLRemoteAftResult?, ext: Any?) {
+                // Obtain the transcription result notification.
+                if (result?.isComplete == true) {
+                    val transcribedFile: MutableList<TranscriptedWord> = mutableListOf()
+                    for (word in result.words) {
+                        transcribedFile.add(
+                            TranscriptedWord(
+                                word.text,
+                                word.startTime,
+                                word.endTime
+                            )
+                        )
+                    }
+                    App.transcribedFile = transcribedFile
+                    activity?.runOnUiThread(Runnable {
+                        tts_loader_background.visibility = View.GONE
+                        tts_loader.visibility = View.GONE
+                        val bundle = Bundle()
+                        bundle.putString("audioPath", audioPath)
+                        bundle.putString("convertedText", textInput.text.toString())
+                        val destinationFragment = PlayerFragment()
+                        destinationFragment.arguments = bundle
+                        fragmentManager?.beginTransaction()
+                            ?.replace(R.id.fragment_container, destinationFragment)?.commit()
+                    })
+                }
+            }
+
+            override fun onError(taskId: String, errorCode: Int, message: String) {
+            }
+
+            override fun onInitComplete(taskId: String, ext: Any) {
+                // Reserved.
+            }
+
+            override fun onUploadProgress(taskId: String, progress: Double, ext: Any) {
+                // Reserved.
+            }
+
+            override fun onEvent(taskId: String, eventId: Int, ext: Any) {
+                // Reserved.
+            }
+        }
+        return aftListener
+    }
+
+
     private fun initAiDubbing(mConfig: HAEAiDubbingConfig?) {
         var mConfig = mConfig
         if (mConfig == null) {
@@ -179,7 +248,6 @@ class DubbingFragment : Fragment() {
                 pair: Pair<Int, Int>,
                 bundle: Bundle
             ) {
-
                 val pcmFile = setAudioFileName(
                     fileName,
                     PCM_EXT
@@ -208,17 +276,7 @@ class DubbingFragment : Fragment() {
                             AudioFormat.CHANNEL_IN_MONO,
                             AudioFormat.ENCODING_PCM_16BIT
                         )
-
-                        activity?.runOnUiThread(Runnable {
-                            tts_loader_background.visibility = View.GONE
-                            tts_loader.visibility = View.GONE
-                            val bundle = Bundle()
-                            bundle.putString("audioPath", audioPath)
-                            bundle.putString("audioFileName", "$fileName.wav")
-                            val destinationFragment = PlayerFragment()
-                            destinationFragment.arguments = bundle
-                            fragmentManager?.beginTransaction()?.replace(R.id.fragment_container,destinationFragment)?.commit()
-                        })
+                        initTranscription()
                     }
                 }
             }

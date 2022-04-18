@@ -15,20 +15,26 @@
  */
 package com.huawei.audioeditorkitcustomdemo.ui
 
-import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import com.huawei.audioeditorkitcustomdemo.App
 import com.huawei.audioeditorkitcustomdemo.R
+import com.huawei.audioeditorkitcustomdemo.model.TranscriptedWord
 import com.huawei.hms.audioeditor.sdk.HuaweiAudioEditor
 import com.huawei.hms.audioeditor.sdk.asset.HAEAudioAsset
 import com.huawei.hms.audioeditor.sdk.lane.HAEAudioLane
+
 
 class PlayerFragment : Fragment() {
 
@@ -36,7 +42,7 @@ class PlayerFragment : Fragment() {
     private lateinit var playPauseButton: Button
     private lateinit var audioProgressBar: SeekBar
     private lateinit var audioDuration: TextView
-    private lateinit var txtFileName: TextView
+    private lateinit var textInput: TextView
     private lateinit var audioSpeedMenu: Button
     private lateinit var mEditor: HuaweiAudioEditor
     private var speed: Float = 1f
@@ -46,6 +52,12 @@ class PlayerFragment : Fragment() {
     private var audioLength: Long = 0
     private var isAudioFinished = false
     private var onPause = false
+
+    private var highlightedWord: TranscriptedWord? = null
+    private var textToHighlight: String? = ""
+
+    private var wordIndex = 0
+    private var currentWord = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,10 +71,11 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListeners()
-        val bundle : Bundle? = arguments
+        val bundle: Bundle? = arguments
         val audioPath = bundle?.getString("audioPath")
-        val fileName = bundle?.getString("audioFileName")
-        txtFileName.text = fileName
+        val text = bundle?.getString("convertedText")
+        textInput.text = text
+        textToHighlight = text
 
         mEditor = HuaweiAudioEditor.create(requireContext())
         mEditor.initEnvironment()
@@ -81,6 +94,7 @@ class PlayerFragment : Fragment() {
                     audioDuration.text = leftTime
                     audioProgressBar.progress = progressAudio
                 })
+                highlightWord(current)
             }
 
             override fun onPlayStopped() {
@@ -99,8 +113,40 @@ class PlayerFragment : Fragment() {
                 Log.i(TAG, "Error occurred during audio play.")
             }
         })
-
     }
+
+    private fun highlightWord(current: Long) {
+        val transcribedFile = App.transcribedFile
+        for (transcribedWord in transcribedFile!!) {
+            if (transcribedWord.getEndTime() > current && current > transcribedWord.getStartTime()) {
+                if (currentWord != (transcribedWord.getWord())) {
+                    currentWord = transcribedWord.getWord()
+                    currentWord.let {
+                        val startIndex =
+                            textToHighlight?.lowercase()
+                                ?.indexOf(it.lowercase(), wordIndex)
+                        if (startIndex != -1) {
+                            val stopIndex = startIndex?.plus(it.length)
+                            activity?.runOnUiThread {
+                                val highlightedSpannableWord =
+                                    SpannableString(textInput.text)
+                                highlightedSpannableWord.setSpan(
+                                    ForegroundColorSpan(Color.BLUE),
+                                    startIndex!!,
+                                    stopIndex!!,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                                textInput.text = highlightedSpannableWord
+                            }
+                            wordIndex = stopIndex!!
+                        }
+                    }
+                    break
+                }
+            }
+        }
+    }
+
     private fun millToTime(): String {
         val current = audioLength - (progressAudio * audioLength / 100)
         val secDuration = current / 1000
@@ -115,15 +161,15 @@ class PlayerFragment : Fragment() {
         return leftTime
     }
 
-    private fun initUI(containerView: View){
+    private fun initUI(containerView: View) {
         playPauseButton = containerView.findViewById(R.id.btn_play_pause)
         audioDuration = containerView.findViewById(R.id.txt_clock_audio)
         audioSpeedMenu = containerView.findViewById(R.id.spinner_tts)
         audioProgressBar = containerView.findViewById(R.id.seekbar_tts)
-        txtFileName = containerView.findViewById(R.id.txt_filename)
+        textInput = containerView.findViewById(R.id.txt_input)
     }
 
-    private fun initListeners(){
+    private fun initListeners() {
         audioSpeedMenu.setOnClickListener {
             if (audioAsset != null && audioLane != null) {
                 when (speed) {
