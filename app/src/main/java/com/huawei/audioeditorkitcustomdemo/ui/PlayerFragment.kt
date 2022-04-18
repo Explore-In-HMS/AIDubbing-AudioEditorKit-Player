@@ -30,7 +30,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.huawei.audioeditorkitcustomdemo.App
 import com.huawei.audioeditorkitcustomdemo.R
-import com.huawei.audioeditorkitcustomdemo.model.TranscriptedWord
 import com.huawei.hms.audioeditor.sdk.HuaweiAudioEditor
 import com.huawei.hms.audioeditor.sdk.asset.HAEAudioAsset
 import com.huawei.hms.audioeditor.sdk.lane.HAEAudioLane
@@ -53,9 +52,7 @@ class PlayerFragment : Fragment() {
     private var isAudioFinished = false
     private var onPause = false
 
-    private var highlightedWord: TranscriptedWord? = null
     private var textToHighlight: String? = ""
-
     private var wordIndex = 0
     private var currentWord = ""
 
@@ -128,6 +125,17 @@ class PlayerFragment : Fragment() {
                         if (startIndex != -1) {
                             val stopIndex = startIndex?.plus(it.length)
                             activity?.runOnUiThread {
+
+                                val makeItWhite =
+                                    SpannableString(textInput.text)
+                                makeItWhite.setSpan(
+                                    ForegroundColorSpan(Color.WHITE),
+                                    0,
+                                    textInput.text.length,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                                textInput.text = makeItWhite
+
                                 val highlightedSpannableWord =
                                     SpannableString(textInput.text)
                                 highlightedSpannableWord.setSpan(
