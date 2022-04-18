@@ -3,17 +3,21 @@
 ![Kotlin](https://img.shields.io/badge/language-kotlin-blue) ![Minimum SDK Version](https://img.shields.io/badge/minSDK-21-orange) ![Android Gradle Version](https://img.shields.io/badge/androidGradleVersion-4.0.0-green) ![Gradle Version](https://img.shields.io/badge/gradleVersion-6.1.1-brown)
 
 ## App View
-![final](https://user-images.githubusercontent.com/17616681/162732484-095eb025-243a-4fa4-b941-a90694ff1626.gif)
+<img src="https://user-images.githubusercontent.com/17616681/163865623-db7608fb-3f13-4837-b384-26015196120b.gif" width="300"/>
 
 ## Screenshots
-![1](https://user-images.githubusercontent.com/17616681/162731844-8498a736-7cb0-4923-9e97-62270db7622a.jpg)
 
+<img src="https://user-images.githubusercontent.com/17616681/163866237-2be1f6bd-3439-4eed-8d5f-b3b9a043431c.jpg" width="300"/><img src="https://user-images.githubusercontent.com/17616681/163866456-329cb4f5-65f1-44b5-9339-2c75738af38d.jpg" width="300"/>
 
 ## :notebook_with_decorative_cover: Introduction 
 AIDubbing-AudioEditorKit-Player; It is created with HMS kits for phones running with the Android-based HMS service an application where you can convert text to the audio file with AIDubbing and play/control audio file with Audio Editor Kit.
+ML kit file transcription is used for highlighting and tracking text while reading.
 
 ## :notebook_with_decorative_cover: About HUAWEI Audio Editor Kit
 Audio Editor Kit provides a wide range of audio editing capabilities, including AI dubbing, audio source separation, spatial audio, voice changer, and sound effects. With these capabilities, the kit serves as a one-stop solution for you to develop audio-related functions in your app with ease. In this project AI dubbing feature is used to vocalize news. To discover more, visit: [Huawei Audio Editor Kit](https://developer.huawei.com/consumer/en/hms/huawei-audio-editor/)
+
+## :notebook_with_decorative_cover: About HUAWEI ML Kit File Transcription
+The audio file transcription service can convert an audio file not longer than five hours into text with punctuation and automatically segment the text for easy understanding. In addition, this service supports the generation of text with timestamps, facilitating subsequent function development. In this version, both Chinese and English are supported. To discover more, visit: [Huawei ML Kit File Transcription](https://developer.huawei.com/consumer/en/doc/development/hiai-Guides/audio-file-transcription-0000001050040089)
 
 ## :information_source: Technical Information
 * Project Software Language: Kotlin
@@ -54,11 +58,14 @@ After creating the application, you need to [generate a signing certificate fing
 
 - On player page user can play/pause audio file and change its speed. Also there is left time indicator that show left time of audio.
 
+- While playing audio, words will be highlighted and tracked.
+
 ## :rocket: Features 
 * Convert text to the audio file.
 * Play converted audio.
 * Change speed of audio.
 * Change type of speaker(Male/Female).
+* Convert audio file to data includes words and their timeline.
 
 ## :link: Useful Links 
 * [Huawei Developers Medium Page EN](https://medium.com/huawei-developers)
